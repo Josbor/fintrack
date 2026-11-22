@@ -1,0 +1,66 @@
+.main {
+  background:
+    radial-gradient(70% 55% at 88% 0%, rgb(16 185 129 / 0.12), transparent 65%),
+    radial-gradient(55% 45% at 0% 100%, rgb(45 212 191 / 0.1), transparent 65%),
+    #f8fafc;
+}
+
+.dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgb(15 23 42 / 0.14) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.35;
+  mask-image: radial-gradient(65% 55% at 50% 35%, #000, transparent 80%);
+  pointer-events: none;
+}
+
+@media (min-width: 1024px) and (min-height: 740px) {
+  .shell {
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .aside {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .main {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .inner {
+    min-height: 0;
+    padding-block: 1.5rem;
+  }
+
+  .content {
+    min-height: 0;
+    padding-block: 1.25rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .content > * {
+    margin-block: auto;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 840px) {
+  .inner {
+    padding-block: 0.75rem;
+  }
+
+  .content {
+    padding-block: 0.5rem;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 800px) {
+  .inner > footer {
+    display: none;
+  }
+}
