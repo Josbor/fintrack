@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
 import { Button } from '../atoms/Button'
 import { Spinner } from '../atoms/Spinner'
 import { FormAlert } from '../molecules/FormAlert'
@@ -7,7 +7,7 @@ import { CreateTransactionForm } from './CreateTransactionForm'
 import { EditTransactionForm } from './EditTransactionForm'
 import type { Account } from '../../lib/accounts'
 import type { Category } from '../../lib/categories'
-import { getReceiptUrl } from '../../lib/receipts'
+import { RECEIPT_ACCEPT, getReceiptUrl, validateReceiptFile } from '../../lib/receipts'
 import { deleteTransaction, type Transaction } from '../../lib/transactions'
 
 type TransactionsPanelProps = {
@@ -30,18 +30,40 @@ export function TransactionsPanel({
   onChanged,
 }: TransactionsPanelProps) {
   const [isCreating, setIsCreating] = useState(false)
+  const [createFile, setCreateFile] = useState<File | null>(null)
+  const [createKey, setCreateKey] = useState(0)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const accountsById = new Map(accounts.map((account) => [account.id, account]))
   const categoriesById = new Map(categories.map((category) => [category.id, category]))
   const hasAccounts = accounts.length > 0
   const editingTransaction = transactions.find((item) => item.id === editingId) ?? null
 
-  function startCreating() {
+  function startCreating(file: File | null = null) {
+    setIsMenuOpen(false)
     setEditingId(null)
+    setCreateFile(file)
+    setCreateKey((key) => key + 1)
     setIsCreating(true)
+  }
+
+  function handleInvoiceChosen(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+
+    const validationError = validateReceiptFile(file)
+    if (validationError) {
+      setActionError(validationError)
+      return
+    }
+
+    setActionError(null)
+    startCreating(file)
   }
 
   function startEditing(id: string) {
@@ -96,9 +118,49 @@ export function TransactionsPanel({
           <p className="text-xs text-slate-500">Los 50 más recientes</p>
         </div>
         {!isCreating && (
-          <Button onClick={startCreating} disabled={!hasAccounts}>
-            Nuevo movimiento
-          </Button>
+          <div className="relative">
+            <Button
+              onClick={() => setIsMenuOpen((open) => !open)}
+              disabled={!hasAccounts}
+              aria-label="Agregar movimiento"
+              aria-expanded={isMenuOpen}
+              className="size-10 px-0 text-xl"
+            >
+              +
+            </Button>
+
+            {isMenuOpen && (
+              <div className="absolute right-0 z-10 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-card">
+                <button
+                  type="button"
+                  onClick={() => startCreating()}
+                  className="block w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Agregar manualmente
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    fileInputRef.current?.click()
+                  }}
+                  className="block w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Desde una factura
+                </button>
+              </div>
+            )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={RECEIPT_ACCEPT}
+              onChange={handleInvoiceChosen}
+              className="sr-only"
+              tabIndex={-1}
+              aria-hidden="true"
+            />
+          </div>
         )}
       </div>
 
@@ -108,11 +170,13 @@ export function TransactionsPanel({
 
       {isCreating && hasAccounts && (
         <CreateTransactionForm
+          key={createKey}
           accounts={accounts}
           categories={categories}
           onCategoryCreated={onCategoryCreated}
           onCreated={handleSaved}
           onCancel={() => setIsCreating(false)}
+          initialFile={createFile}
         />
       )}
 
