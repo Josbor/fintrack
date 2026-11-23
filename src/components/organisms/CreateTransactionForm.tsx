@@ -23,6 +23,7 @@ type CreateTransactionFormProps = {
   onCreated: () => void
   onCancel: () => void
   initialFile?: File | null
+  lockedAccountId?: string | null
 }
 
 function todayIso() {
@@ -36,12 +37,13 @@ export function CreateTransactionForm({
   onCreated,
   onCancel,
   initialFile = null,
+  lockedAccountId = null,
 }: CreateTransactionFormProps) {
   const [type, setType] = useState<CreatableTransactionType>('expense')
   const [amount, setAmount] = useState('')
   const [description, setDescription] = useState('')
   const [occurredOn, setOccurredOn] = useState(todayIso)
-  const [accountId, setAccountId] = useState(accounts[0]?.id ?? '')
+  const [accountId, setAccountId] = useState(lockedAccountId ?? accounts[0]?.id ?? '')
   const [transferAccountId, setTransferAccountId] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [payee, setPayee] = useState('')
@@ -232,6 +234,7 @@ export function CreateTransactionForm({
           <Select
             id="transaction-account"
             value={accountId}
+            disabled={Boolean(lockedAccountId)}
             hasError={Boolean(errors.account)}
             onChange={(event) => {
               setAccountId(event.target.value)

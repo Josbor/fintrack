@@ -78,6 +78,7 @@ export function DashboardPage() {
         categories={categories}
         isLoading={transactionsData.isLoading || isLoadingCategories}
         error={transactionsData.error}
+        selectedAccountId={selectedAccountId}
         selectedAccountName={selectedAccount?.name ?? null}
         onClearAccount={() => setSelectedAccountId(null)}
         onCategoryCreated={(category) =>

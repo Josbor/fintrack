@@ -16,6 +16,7 @@ type TransactionsPanelProps = {
   categories: Category[]
   isLoading: boolean
   error: string | null
+  selectedAccountId: string | null
   selectedAccountName: string | null
   onClearAccount: () => void
   onCategoryCreated: (category: Category) => void
@@ -28,6 +29,7 @@ export function TransactionsPanel({
   categories,
   isLoading,
   error,
+  selectedAccountId,
   selectedAccountName,
   onClearAccount,
   onCategoryCreated,
@@ -187,13 +189,14 @@ export function TransactionsPanel({
 
       {isCreating && hasAccounts && (
         <CreateTransactionForm
-          key={createKey}
+          key={`${createKey}-${selectedAccountId ?? 'all'}`}
           accounts={accounts}
           categories={categories}
           onCategoryCreated={onCategoryCreated}
           onCreated={handleSaved}
           onCancel={() => setIsCreating(false)}
           initialFile={createFile}
+          lockedAccountId={selectedAccountId}
         />
       )}
 
