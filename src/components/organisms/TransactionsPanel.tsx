@@ -16,6 +16,8 @@ type TransactionsPanelProps = {
   categories: Category[]
   isLoading: boolean
   error: string | null
+  selectedAccountName: string | null
+  onClearAccount: () => void
   onCategoryCreated: (category: Category) => void
   onChanged: () => void
 }
@@ -26,6 +28,8 @@ export function TransactionsPanel({
   categories,
   isLoading,
   error,
+  selectedAccountName,
+  onClearAccount,
   onCategoryCreated,
   onChanged,
 }: TransactionsPanelProps) {
@@ -115,7 +119,20 @@ export function TransactionsPanel({
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-xl font-bold text-slate-900">Movimientos</h2>
-          <p className="text-xs text-slate-500">Los 50 más recientes</p>
+          {selectedAccountName ? (
+            <p className="flex items-center gap-2 text-xs text-slate-500">
+              De <span className="font-semibold text-slate-700">{selectedAccountName}</span>
+              <button
+                type="button"
+                onClick={onClearAccount}
+                className="font-semibold text-brand-700 hover:text-brand-800"
+              >
+                Ver todas
+              </button>
+            </p>
+          ) : (
+            <p className="text-xs text-slate-500">Los 50 más recientes de todas tus cuentas</p>
+          )}
         </div>
         {!isCreating && (
           <div className="relative">
@@ -205,7 +222,9 @@ export function TransactionsPanel({
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center">
             <p className="text-sm font-semibold text-slate-900">Sin movimientos todavía</p>
             <p className="mt-1 text-xs text-slate-500">
-              Registra tu primer ingreso, gasto o transferencia.
+              {selectedAccountName
+                ? `${selectedAccountName} aún no tiene movimientos.`
+                : 'Registra tu primer ingreso, gasto o transferencia.'}
             </p>
           </div>
         )

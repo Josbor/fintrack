@@ -11,10 +11,19 @@ type AccountsPanelProps = {
   accounts: Account[]
   isLoading: boolean
   error: string | null
+  selectedAccountId: string | null
+  onSelectAccount: (accountId: string | null) => void
   onChanged: () => void
 }
 
-export function AccountsPanel({ accounts, isLoading, error, onChanged }: AccountsPanelProps) {
+export function AccountsPanel({
+  accounts,
+  isLoading,
+  error,
+  selectedAccountId,
+  onSelectAccount,
+  onChanged,
+}: AccountsPanelProps) {
   const [isCreating, setIsCreating] = useState(false)
 
   function handleCreated() {
@@ -22,16 +31,24 @@ export function AccountsPanel({ accounts, isLoading, error, onChanged }: Account
     onChanged()
   }
 
+  function handleSelect(accountId: string) {
+    onSelectAccount(accountId === selectedAccountId ? null : accountId)
+  }
+
   return (
     <section className="space-y-5">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-xl font-bold text-slate-900">Cuentas</h2>
-          <p className="text-xs text-slate-500">Tus cuentas y su saldo actual</p>
+          <p className="text-xs text-slate-500">Selecciona una cuenta para ver sus movimientos</p>
         </div>
         {!isCreating && (
-          <Button size="md" onClick={() => setIsCreating(true)}>
-            Nueva cuenta
+          <Button
+            onClick={() => setIsCreating(true)}
+            aria-label="Nueva cuenta"
+            className="size-10 px-0 text-xl"
+          >
+            +
           </Button>
         )}
       </div>
@@ -62,7 +79,12 @@ export function AccountsPanel({ accounts, isLoading, error, onChanged }: Account
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {accounts.map((account) => (
-            <AccountCard key={account.id} account={account} />
+            <AccountCard
+              key={account.id}
+              account={account}
+              isSelected={account.id === selectedAccountId}
+              onSelect={() => handleSelect(account.id)}
+            />
           ))}
         </div>
       )}

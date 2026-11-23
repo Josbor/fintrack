@@ -60,13 +60,22 @@ type TransactionRow = {
   receipt_path: string | null
 }
 
-export async function listTransactions(limit = 50): Promise<Transaction[]> {
-  const { data, error } = await supabase
+export async function listTransactions(
+  accountId: string | null = null,
+  limit = 50,
+): Promise<Transaction[]> {
+  let query = supabase
     .from('transactions')
     .select(
       'id, type, amount, description, payee, notes, occurred_at, account_id, transfer_account_id, category_id, receipt_path',
     )
     .is('deleted_at', null)
+
+  if (accountId) {
+    query = query.or(`account_id.eq.${accountId},transfer_account_id.eq.${accountId}`)
+  }
+
+  const { data, error } = await query
     .order('occurred_at', { ascending: false })
     .order('created_at', { ascending: false })
     .limit(limit)

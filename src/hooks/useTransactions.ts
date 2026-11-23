@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { listTransactions, type Transaction } from '../lib/transactions'
 
-export function useTransactions() {
+export function useTransactions(accountId: string | null) {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -10,7 +10,7 @@ export function useTransactions() {
   useEffect(() => {
     let isActive = true
 
-    listTransactions()
+    listTransactions(accountId)
       .then((data) => {
         if (!isActive) return
         setTransactions(data)
@@ -26,7 +26,7 @@ export function useTransactions() {
     return () => {
       isActive = false
     }
-  }, [refreshKey])
+  }, [accountId, refreshKey])
 
   const reload = useCallback(() => {
     setIsLoading(true)

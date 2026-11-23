@@ -3,13 +3,24 @@ import { accountTypeLabel, formatMoney, type Account } from '../../lib/accounts'
 
 type AccountCardProps = {
   account: Account
+  isSelected: boolean
+  onSelect: () => void
 }
 
-export function AccountCard({ account }: AccountCardProps) {
+export function AccountCard({ account, isSelected, onSelect }: AccountCardProps) {
   const isNegative = account.balance < 0
 
   return (
-    <article className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md">
+    <button
+      type="button"
+      onClick={onSelect}
+      aria-pressed={isSelected}
+      className={`flex flex-col gap-4 rounded-2xl border bg-white p-5 text-left shadow-sm transition hover:shadow-md focus-visible:ring-4 focus-visible:ring-brand-500/20 outline-none ${
+        isSelected
+          ? 'border-brand-500 ring-4 ring-brand-500/10'
+          : 'border-slate-200 hover:border-slate-300'
+      }`}
+    >
       <div className="flex items-center gap-3">
         <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700">
           <WalletIcon className="size-5" />
@@ -27,6 +38,6 @@ export function AccountCard({ account }: AccountCardProps) {
       >
         {formatMoney(account.balance, account.currency)}
       </p>
-    </article>
+    </button>
   )
 }

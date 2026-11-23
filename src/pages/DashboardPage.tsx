@@ -19,10 +19,14 @@ export function DashboardPage() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
   const accountsData = useAccounts()
-  const transactionsData = useTransactions()
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null)
+  const transactionsData = useTransactions(selectedAccountId)
   const { categories, setCategories, isLoading: isLoadingCategories } = useCategories()
   const [isSigningOut, setIsSigningOut] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+
+  const selectedAccount =
+    accountsData.accounts.find((account) => account.id === selectedAccountId) ?? null
 
   const fullName = (user?.user_metadata?.full_name as string | undefined)?.trim()
   const firstName = fullName?.split(' ')[0] ?? 'de nuevo'
@@ -63,6 +67,8 @@ export function DashboardPage() {
         accounts={accountsData.accounts}
         isLoading={accountsData.isLoading}
         error={accountsData.error}
+        selectedAccountId={selectedAccountId}
+        onSelectAccount={setSelectedAccountId}
         onChanged={refreshData}
       />
 
@@ -72,6 +78,8 @@ export function DashboardPage() {
         categories={categories}
         isLoading={transactionsData.isLoading || isLoadingCategories}
         error={transactionsData.error}
+        selectedAccountName={selectedAccount?.name ?? null}
+        onClearAccount={() => setSelectedAccountId(null)}
         onCategoryCreated={(category) =>
           setCategories((current) =>
             [...current, category].sort((a, b) => a.name.localeCompare(b.name)),
