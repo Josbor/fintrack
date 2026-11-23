@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
+import { Button } from '../components/atoms/Button'
+import { Modal } from '../components/molecules/Modal'
+import { TotalBalanceCard } from '../components/molecules/TotalBalanceCard'
+import { AccountsPanel } from '../components/organisms/AccountsPanel'
+import { PreferencesPanel } from '../components/organisms/PreferencesPanel'
+import { TransactionsPanel } from '../components/organisms/TransactionsPanel'
+import { DashboardLayout } from '../components/templates/DashboardLayout'
 import { useAccounts } from '../hooks/useAccounts'
 import { useCategories } from '../hooks/useCategories'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useTransactions } from '../hooks/useTransactions'
-import { TotalBalanceCard } from '../components/molecules/TotalBalanceCard'
-import { AccountsPanel } from '../components/organisms/AccountsPanel'
-import { TransactionsPanel } from '../components/organisms/TransactionsPanel'
-import { DashboardLayout } from '../components/templates/DashboardLayout'
 
 export function DashboardPage() {
   usePageTitle('FinTrack · Tu panel')
@@ -19,6 +22,7 @@ export function DashboardPage() {
   const transactionsData = useTransactions()
   const { categories, setCategories, isLoading: isLoadingCategories } = useCategories()
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   const fullName = (user?.user_metadata?.full_name as string | undefined)?.trim()
   const firstName = fullName?.split(' ')[0] ?? 'de nuevo'
@@ -35,7 +39,15 @@ export function DashboardPage() {
   }
 
   return (
-    <DashboardLayout onSignOut={handleSignOut} isSigningOut={isSigningOut}>
+    <DashboardLayout
+      onSignOut={handleSignOut}
+      isSigningOut={isSigningOut}
+      headerActions={
+        <Button variant="ghost" onClick={() => setIsSettingsOpen(true)}>
+          Configuración
+        </Button>
+      }
+    >
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-700">
           Tu panel
@@ -67,6 +79,10 @@ export function DashboardPage() {
         }
         onChanged={refreshData}
       />
+
+      <Modal open={isSettingsOpen} title="Configuración" onClose={() => setIsSettingsOpen(false)}>
+        <PreferencesPanel />
+      </Modal>
     </DashboardLayout>
   )
 }
