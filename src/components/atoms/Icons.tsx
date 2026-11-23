@@ -28,6 +28,17 @@ export function UserIcon(props: IconProps) {
   )
 }
 
+export function TransferIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <path d="M4 8h13" />
+      <path d="m13 4 4 4-4 4" />
+      <path d="M20 16H7" />
+      <path d="m11 12-4 4 4 4" />
+    </StrokeIcon>
+  )
+}
+
 export function MailIcon(props: IconProps) {
   return (
     <StrokeIcon {...props}>

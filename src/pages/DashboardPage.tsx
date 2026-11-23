@@ -7,6 +7,7 @@ import { TotalBalanceCard } from '../components/molecules/TotalBalanceCard'
 import { AccountsPanel } from '../components/organisms/AccountsPanel'
 import { PreferencesPanel } from '../components/organisms/PreferencesPanel'
 import { TransactionsPanel } from '../components/organisms/TransactionsPanel'
+import { TransferForm } from '../components/organisms/TransferForm'
 import { DashboardLayout } from '../components/templates/DashboardLayout'
 import { useAccounts } from '../hooks/useAccounts'
 import { useCategories } from '../hooks/useCategories'
@@ -24,6 +25,7 @@ export function DashboardPage() {
   const { categories, setCategories, isLoading: isLoadingCategories } = useCategories()
   const [isSigningOut, setIsSigningOut] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isTransferOpen, setIsTransferOpen] = useState(false)
 
   const selectedAccount =
     accountsData.accounts.find((account) => account.id === selectedAccountId) ?? null
@@ -69,6 +71,7 @@ export function DashboardPage() {
         error={accountsData.error}
         selectedAccountId={selectedAccountId}
         onSelectAccount={setSelectedAccountId}
+        onTransfer={() => setIsTransferOpen(true)}
         onChanged={refreshData}
       />
 
@@ -91,6 +94,21 @@ export function DashboardPage() {
 
       <Modal open={isSettingsOpen} title="Configuración" onClose={() => setIsSettingsOpen(false)}>
         <PreferencesPanel />
+      </Modal>
+
+      <Modal
+        open={isTransferOpen}
+        title="Transferir entre cuentas"
+        onClose={() => setIsTransferOpen(false)}
+      >
+        <TransferForm
+          accounts={accountsData.accounts}
+          onCreated={() => {
+            setIsTransferOpen(false)
+            refreshData()
+          }}
+          onCancel={() => setIsTransferOpen(false)}
+        />
       </Modal>
     </DashboardLayout>
   )

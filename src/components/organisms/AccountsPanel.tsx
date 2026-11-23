@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from '../atoms/Button'
 import { Spinner } from '../atoms/Spinner'
-import { WalletIcon } from '../atoms/Icons'
+import { TransferIcon, WalletIcon } from '../atoms/Icons'
 import { AccountCard } from '../molecules/AccountCard'
 import { FormAlert } from '../molecules/FormAlert'
 import { CreateAccountForm } from './CreateAccountForm'
@@ -13,6 +13,7 @@ type AccountsPanelProps = {
   error: string | null
   selectedAccountId: string | null
   onSelectAccount: (accountId: string | null) => void
+  onTransfer: () => void
   onChanged: () => void
 }
 
@@ -22,6 +23,7 @@ export function AccountsPanel({
   error,
   selectedAccountId,
   onSelectAccount,
+  onTransfer,
   onChanged,
 }: AccountsPanelProps) {
   const [isCreating, setIsCreating] = useState(false)
@@ -43,13 +45,25 @@ export function AccountsPanel({
           <p className="text-xs text-slate-500">Selecciona una cuenta para ver sus movimientos</p>
         </div>
         {!isCreating && (
-          <Button
-            onClick={() => setIsCreating(true)}
-            aria-label="Nueva cuenta"
-            className="size-10 px-0 text-xl"
-          >
-            +
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="social"
+              onClick={onTransfer}
+              disabled={accounts.length < 2}
+              aria-label="Transferir entre cuentas"
+              title="Transferir entre cuentas"
+              className="size-10 px-0"
+            >
+              <TransferIcon className="size-5" />
+            </Button>
+            <Button
+              onClick={() => setIsCreating(true)}
+              aria-label="Nueva cuenta"
+              className="size-10 px-0 text-xl"
+            >
+              +
+            </Button>
+          </div>
         )}
       </div>
 
