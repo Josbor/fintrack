@@ -66,6 +66,26 @@ Si hay sesión activa, `/` y `/registro` redirigen a `/app`. Si no hay sesión, 
 
 > La `anon key` es pública y puede vivir en el frontend. La `service_role` / secret **nunca** debe usarse en el cliente.
 
+## Base de datos
+
+El esquema vive en `supabase/migrations/` y se aplica con la CLI de Supabase (incluida como dependencia de desarrollo).
+
+```bash
+npx supabase login                                  # solo la primera vez
+npx supabase link --project-ref tesmbrksetdwtpjbzmbi
+npx supabase db push                                # aplica migraciones pendientes
+```
+
+Para un cambio nuevo:
+
+```bash
+npx supabase migration new nombre_del_cambio
+```
+
+Regla: una migración ya aplicada no se edita; se añade otra que ajuste la anterior.
+
+Tablas: `profiles`, `accounts`, `categories` y `transactions`, todas con RLS (`user_id = auth.uid()`).
+
 ## Scripts
 
 ```bash
@@ -83,6 +103,6 @@ npm run lint     # ESLint
 - El medidor de contraseña indica la seguridad en tiempo real.
 - Los errores de Supabase se traducen a mensajes claros en español.
 - Los accesos sociales (Google/Apple) muestran un aviso de "próximamente".
-- Las tablas de datos (`accounts`, `transactions`, etc.) y sus políticas RLS todavía están pendientes.
+- Las tablas de datos y sus políticas RLS se definen en `supabase/migrations/` y se aplican con `npx supabase db push`.
 - En escritorio el panel de marca queda fijo al alto de la ventana (`100dvh`) y la pantalla no genera scroll. En ventanas bajas se compacta automáticamente (oculta features y footer) para mantener todo visible.
 - Los estilos globales y tokens de color/tipografía viven en `src/index.css`; los estilos muy específicos usan CSS Modules junto a cada componente.
