@@ -4,6 +4,7 @@ import { Label } from '../atoms/Label'
 import { Select } from '../atoms/Select'
 import { FormAlert } from '../molecules/FormAlert'
 import { FormField } from '../molecules/FormField'
+import { FormSkeleton } from '../molecules/FormSkeleton'
 import { TransactionTypeToggle } from '../molecules/TransactionTypeToggle'
 import { CategoryField } from '../molecules/CategoryField'
 import { ReceiptField } from '../molecules/ReceiptField'
@@ -21,6 +22,7 @@ type CreateTransactionFormProps = {
   onCategoryCreated: (category: Category) => void
   onCreated: () => void
   onCancel: () => void
+  initialFile?: File | null
 }
 
 function todayIso() {
@@ -33,6 +35,7 @@ export function CreateTransactionForm({
   onCategoryCreated,
   onCreated,
   onCancel,
+  initialFile = null,
 }: CreateTransactionFormProps) {
   const [type, setType] = useState<CreatableTransactionType>('expense')
   const [amount, setAmount] = useState('')
@@ -45,6 +48,7 @@ export function CreateTransactionForm({
   const [notes, setNotes] = useState('')
   const [receiptPath, setReceiptPath] = useState<string | null>(null)
   const [receiptName, setReceiptName] = useState<string | null>(null)
+  const [isReadingReceipt, setIsReadingReceipt] = useState(false)
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
@@ -73,10 +77,10 @@ export function CreateTransactionForm({
     setReceiptPath(attachment.path)
     setReceiptName(attachment.name)
     if (previous) await removeReceipt(previous).catch(() => undefined)
+    if (attachment.draft) applyDraft(attachment.draft)
+  }
 
-    const draft = attachment.draft
-    if (!draft) return
-
+  function applyDraft(draft: ReceiptDraft) {
     if (draft.amount && !amount.trim()) setAmount(String(draft.amount))
     if (draft.description && !description.trim()) setDescription(draft.description)
     if (draft.merchant && !payee.trim()) setPayee(draft.merchant)
@@ -161,12 +165,20 @@ export function CreateTransactionForm({
       </div>
 
       <ReceiptField
+        receiptPath={receiptPath}
         receiptName={receiptName}
         currency={currency}
+        categoryNames={categories.filter((item) => item.kind === categoryKind).map((item) => item.name)}
         onAttached={handleAttached}
+        onDraft={applyDraft}
         onRemove={handleRemoveReceipt}
+        initialFile={initialFile}
+        onProcessingChange={setIsReadingReceipt}
       />
 
+      {isReadingReceipt ? (
+        <FormSkeleton label="Leyendo la factura… los campos se habilitarán al terminar." />
+      ) : (
       <div className="grid gap-4 sm:grid-cols-2">
         <FormField
           label="Monto"
@@ -291,6 +303,7 @@ export function CreateTransactionForm({
           }}
         />
       </div>
+      )}
 
       {formError && <FormAlert tone="error">{formError}</FormAlert>}
 
@@ -301,11 +314,11 @@ export function CreateTransactionForm({
             if (receiptPath) await removeReceipt(receiptPath).catch(() => undefined)
             onCancel()
           }}
-          disabled={isSubmitting}
+          disabled={isSubmitting || isReadingReceipt}
         >
           Cancelar
         </Button>
-        <Button type="submit" isLoading={isSubmitting}>
+        <Button type="submit" isLoading={isSubmitting} disabled={isReadingReceipt}>
           Guardar movimiento
         </Button>
       </div>

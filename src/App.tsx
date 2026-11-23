@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { GuestRoute } from './auth/GuestRoute'
 import { ProtectedRoute } from './auth/ProtectedRoute'
+import { ProfileProvider } from './profile/ProfileProvider'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
@@ -14,7 +15,14 @@ function App() {
       </Route>
 
       <Route element={<ProtectedRoute />}>
-        <Route path="/app" element={<DashboardPage />} />
+        <Route
+          path="/app"
+          element={
+            <ProfileProvider>
+              <DashboardPage />
+            </ProfileProvider>
+          }
+        />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

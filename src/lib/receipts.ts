@@ -44,6 +44,19 @@ export async function uploadReceipt(file: File): Promise<string> {
   return path
 }
 
+export async function readReceiptWithAi(path: string, categories: string[]): Promise<ReceiptDraft> {
+  const { data, error } = await supabase.functions.invoke<{ draft: ReceiptDraft; error?: string }>(
+    'extract-receipt',
+    { body: { path, categories } },
+  )
+
+  if (error || !data?.draft) {
+    throw new Error('No pudimos leer la factura con IA. Ingresa los datos manualmente.')
+  }
+
+  return data.draft
+}
+
 export async function getReceiptUrl(path: string) {
   const { data, error } = await supabase.storage.from('receipts').createSignedUrl(path, 300)
 

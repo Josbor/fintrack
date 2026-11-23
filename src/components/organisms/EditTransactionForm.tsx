@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Button } from '../atoms/Button'
 import { FormAlert } from '../molecules/FormAlert'
 import { FormField } from '../molecules/FormField'
+import { FormSkeleton } from '../molecules/FormSkeleton'
 import { CategoryField } from '../molecules/CategoryField'
 import { ReceiptField } from '../molecules/ReceiptField'
 import { formatMoney, accountTypeLabel, type Account } from '../../lib/accounts'
@@ -57,6 +58,7 @@ export function EditTransactionForm({
     originalReceiptPath ? 'Factura adjunta' : null,
   )
 
+  const [isReadingReceipt, setIsReadingReceipt] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -72,6 +74,13 @@ export function EditTransactionForm({
     if (previous && previous !== originalReceiptPath) {
       await removeReceipt(previous).catch(() => undefined)
     }
+    if (attachment.draft) applyDraft(attachment.draft)
+  }
+
+  function applyDraft(draft: ReceiptDraft) {
+    if (draft.description && !description.trim()) setDescription(draft.description)
+    if (draft.merchant && !payee.trim()) setPayee(draft.merchant)
+    if (draft.date) setOccurredOn(draft.date)
   }
 
   function handleRemoveReceipt() {
@@ -146,12 +155,19 @@ export function EditTransactionForm({
       </div>
 
       <ReceiptField
+        receiptPath={receiptPath}
         receiptName={receiptName}
         currency={currency}
+        categoryNames={canHaveCategory ? categories.filter((item) => item.kind === categoryKind).map((item) => item.name) : []}
         onAttached={handleAttached}
+        onDraft={applyDraft}
         onRemove={handleRemoveReceipt}
+        onProcessingChange={setIsReadingReceipt}
       />
 
+      {isReadingReceipt ? (
+        <FormSkeleton label="Leyendo la factura… los campos se habilitarán al terminar." />
+      ) : (
       <div className="grid gap-4 sm:grid-cols-2">
         <FormField
           label="Descripción"
@@ -207,14 +223,19 @@ export function EditTransactionForm({
           />
         </div>
       </div>
+      )}
 
       {formError && <FormAlert tone="error">{formError}</FormAlert>}
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-        <Button variant="ghost" onClick={handleCancel} disabled={isSubmitting}>
+        <Button
+          variant="ghost"
+          onClick={handleCancel}
+          disabled={isSubmitting || isReadingReceipt}
+        >
           Cancelar
         </Button>
-        <Button type="submit" isLoading={isSubmitting}>
+        <Button type="submit" isLoading={isSubmitting} disabled={isReadingReceipt}>
           Guardar cambios
         </Button>
       </div>
