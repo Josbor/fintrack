@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
 import { Button } from '../components/atoms/Button'
+import { SettingsIcon } from '../components/atoms/Icons'
 import { Modal } from '../components/molecules/Modal'
 import { TotalBalanceCard } from '../components/molecules/TotalBalanceCard'
 import { AccountsPanel } from '../components/organisms/AccountsPanel'
@@ -59,8 +60,15 @@ export function DashboardPage() {
       onSignOut={handleSignOut}
       isSigningOut={isSigningOut}
       headerActions={
-        <Button variant="ghost" onClick={() => setIsSettingsOpen(true)} data-tour="settings">
-          Configuración
+        <Button
+          variant="ghost"
+          onClick={() => setIsSettingsOpen(true)}
+          data-tour="settings"
+          aria-label="Configuración"
+          className="px-2.5 whitespace-nowrap sm:px-4"
+        >
+          <SettingsIcon className="size-5 sm:hidden" />
+          <span className="hidden sm:inline">Configuración</span>
         </Button>
       }
     >

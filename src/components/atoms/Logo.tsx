@@ -22,7 +22,7 @@ export function Logo({ tone = 'dark', compact = false, className = '' }: LogoPro
             FinTrack
           </span>
           <span
-            className={`mt-1 text-[10px] font-semibold uppercase tracking-[0.22em] ${
+            className={`mt-1 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.22em] ${
               tone === 'light' ? 'text-brand-200/70' : 'text-slate-400'
             }`}
           >

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Button } from '../atoms/Button'
+import { LogOutIcon } from '../atoms/Icons'
 import { Logo } from '../atoms/Logo'
 
 type DashboardLayoutProps = {
@@ -22,8 +23,15 @@ export function DashboardLayout({
           <Logo />
           <div className="flex items-center gap-2">
             {headerActions}
-            <Button variant="ghost" onClick={onSignOut} isLoading={isSigningOut}>
-              Cerrar sesión
+            <Button
+              variant="ghost"
+              onClick={onSignOut}
+              isLoading={isSigningOut}
+              aria-label="Cerrar sesión"
+              className="px-2.5 whitespace-nowrap sm:px-4"
+            >
+              <LogOutIcon className="size-5 sm:hidden" />
+              <span className="hidden sm:inline">Cerrar sesión</span>
             </Button>
           </div>
         </div>

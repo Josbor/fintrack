@@ -50,10 +50,11 @@ export function TransactionRow({
 
   return (
     <li
-      className={`flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-4 ${
+      className={`flex flex-col gap-3 px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2 sm:px-5 ${
         isEditing ? 'bg-brand-50/50' : ''
       }`}
     >
+      <div className="flex min-w-0 items-center gap-3 sm:contents">
       <time
         dateTime={transaction.occurredAt}
         className="w-14 shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-400"
@@ -62,17 +63,18 @@ export function TransactionRow({
       </time>
 
       <div className="min-w-0 flex-1 basis-40">
-        <p className="truncate text-sm font-semibold text-slate-900">{description}</p>
-        <p className="truncate text-xs text-slate-500">{meta}</p>
-        {notes && <p className="truncate text-xs italic text-slate-400">{notes}</p>}
+        <p className="text-sm font-semibold text-slate-900 sm:truncate">{description}</p>
+        <p className="text-xs text-slate-500 sm:truncate">{meta}</p>
+        {notes && <p className="text-xs italic text-slate-400 sm:truncate">{notes}</p>}
       </div>
 
       <p className={`shrink-0 text-sm font-bold tabular-nums ${amountClass}`}>
         {sign}
         {formatMoney(amount, currency)}
       </p>
+      </div>
 
-      <div className="flex shrink-0 items-center">
+      <div className="flex shrink-0 items-center justify-end">
         {transaction.receiptPath && (
           <Button
             variant="ghost"
