@@ -2,7 +2,6 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import {
-  AppleIcon,
   ArrowRightIcon,
   GoogleIcon,
   MailIcon,
@@ -63,7 +62,7 @@ function validateConfirmPassword(value: string, password: string) {
 }
 
 export function RegisterForm() {
-  const { signUp } = useAuth()
+  const { signUp, signInWithGoogle } = useAuth()
   const navigate = useNavigate()
 
   const [name, setName] = useState('')
@@ -74,7 +73,6 @@ export function RegisterForm() {
   const [errors, setErrors] = useState<FieldErrors>({})
   const [status, setStatus] = useState<SubmitStatus>('idle')
   const [formError, setFormError] = useState<string | null>(null)
-  const [socialNotice, setSocialNotice] = useState<string | null>(null)
 
   const isBusy = status === 'loading'
 
@@ -139,7 +137,6 @@ export function RegisterForm() {
 
     setStatus('loading')
     setFormError(null)
-    setSocialNotice(null)
 
     const { error, needsConfirmation } = await signUp({
       name: name.trim(),
@@ -161,10 +158,11 @@ export function RegisterForm() {
     navigate('/app', { replace: true })
   }
 
-  function handleSocialRegister(provider: string) {
-    setSocialNotice(
-      `El registro con ${provider} estará disponible pronto. Por ahora, usa el formulario.`,
-    )
+  async function handleGoogleRegister() {
+    setFormError(null)
+
+    const { error } = await signInWithGoogle()
+    if (error) setFormError(error)
   }
 
   return (
@@ -182,28 +180,15 @@ export function RegisterForm() {
         </p>
       </header>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="mt-6">
         <SocialButton
           icon={<GoogleIcon className="size-4" />}
-          onClick={() => handleSocialRegister('Google')}
+          onClick={handleGoogleRegister}
           disabled={isBusy}
         >
           Google
         </SocialButton>
-        <SocialButton
-          icon={<AppleIcon className="size-4" />}
-          onClick={() => handleSocialRegister('Apple')}
-          disabled={isBusy}
-        >
-          Apple
-        </SocialButton>
       </div>
-
-      {socialNotice && (
-        <div className="mt-3">
-          <FormAlert tone="info">{socialNotice}</FormAlert>
-        </div>
-      )}
 
       <Divider label="o con tu correo" className="my-6" />
 

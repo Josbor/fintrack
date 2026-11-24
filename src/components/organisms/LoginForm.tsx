@@ -2,7 +2,6 @@ import { useState, type FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import {
-  AppleIcon,
   ArrowRightIcon,
   GoogleIcon,
   MailIcon,
@@ -26,7 +25,7 @@ type FieldErrors = {
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function LoginForm() {
-  const { signIn } = useAuth()
+  const { signIn, signInWithGoogle } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -36,7 +35,6 @@ export function LoginForm() {
   const [errors, setErrors] = useState<FieldErrors>({})
   const [isLoading, setIsLoading] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
-  const [socialNotice, setSocialNotice] = useState<string | null>(null)
 
   const redirectTo = (location.state as { from?: string } | null)?.from ?? '/app'
 
@@ -102,7 +100,6 @@ export function LoginForm() {
 
     setIsLoading(true)
     setFormError(null)
-    setSocialNotice(null)
 
     const { error } = await signIn(email.trim(), password)
 
@@ -115,10 +112,11 @@ export function LoginForm() {
     navigate(redirectTo, { replace: true })
   }
 
-  function handleSocialLogin(provider: string) {
-    setSocialNotice(
-      `El acceso con ${provider} estará disponible pronto. Por ahora, usa tu correo.`,
-    )
+  async function handleGoogleLogin() {
+    setFormError(null)
+
+    const { error } = await signInWithGoogle()
+    if (error) setFormError(error)
   }
 
   return (
@@ -136,28 +134,15 @@ export function LoginForm() {
         </p>
       </div>
 
-      <div className="mt-7 grid grid-cols-2 gap-3">
+      <div className="mt-7">
         <SocialButton
           icon={<GoogleIcon className="size-4" />}
-          onClick={() => handleSocialLogin('Google')}
+          onClick={handleGoogleLogin}
           disabled={isLoading}
         >
           Google
         </SocialButton>
-        <SocialButton
-          icon={<AppleIcon className="size-4" />}
-          onClick={() => handleSocialLogin('Apple')}
-          disabled={isLoading}
-        >
-          Apple
-        </SocialButton>
       </div>
-
-      {socialNotice && (
-        <div className="mt-3">
-          <FormAlert tone="info">{socialNotice}</FormAlert>
-        </div>
-      )}
 
       <Divider label="o con tu correo" className="my-6" />
 
