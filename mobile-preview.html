@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>FinTrack · Vista móvil</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+        color: #e6f4ef;
+        background: radial-gradient(120% 100% at 50% 0%, #0b3b2f 0%, #04241c 55%, #031b15 100%);
+      }
+
+      .bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px 24px;
+        padding: 14px 20px;
+        border-bottom: 1px solid rgb(255 255 255 / 8%);
+        background: rgb(3 27 21 / 70%);
+        backdrop-filter: blur(8px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+      }
+
+      .brand .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: #34d399;
+        box-shadow: 0 0 0 4px rgb(52 211 153 / 15%);
+      }
+
+      .brand .hint {
+        color: #8fb3a7;
+        font-size: 12px;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 14px;
+        font-size: 12px;
+        color: #b9d4ca;
+      }
+
+      .controls label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      select,
+      input[type='number'],
+      button,
+      a.action {
+        font: inherit;
+        color: #e6f4ef;
+        background: rgb(255 255 255 / 7%);
+        border: 1px solid rgb(255 255 255 / 14%);
+        border-radius: 8px;
+        padding: 6px 9px;
+        transition: background 120ms ease, border-color 120ms ease;
+      }
+
+      select:hover,
+      input[type='number']:hover,
+      button:hover,
+      a.action:hover {
+        background: rgb(255 255 255 / 12%);
+        border-color: rgb(255 255 255 / 24%);
+      }
+
+      select:focus-visible,
+      input[type='number']:focus-visible,
+      button:focus-visible,
+      a.action:focus-visible {
+        outline: 2px solid #34d399;
+        outline-offset: 1px;
+      }
+
+      input[type='number'] {
+        width: 68px;
+        padding-right: 4px;
+      }
+
+      input[type='checkbox'] {
+        accent-color: #34d399;
+      }
+
+      a.action {
+        text-decoration: none;
+      }
+
+      .stage {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+        padding: 28px;
+        overflow: auto;
+      }
+
+      .device {
+        flex: none;
+        padding: 10px;
+        border-radius: 46px;
+        background: linear-gradient(160deg, #233040 0%, #0d1622 55%, #050b12 100%);
+        box-shadow:
+          0 0 0 1px rgb(255 255 255 / 8%),
+          0 30px 60px -20px rgb(0 0 0 / 70%),
+          inset 0 1px 0 rgb(255 255 255 / 10%);
+        transform: scale(var(--scale, 1));
+        transform-origin: center center;
+        transition: width 140ms ease, height 140ms ease;
+      }
+
+      .device iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        border-radius: 36px;
+        background: #f8fafc;
+        overflow: hidden;
+      }
+
+      .meta {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 20px 16px;
+        font-size: 11px;
+        color: #7fa396;
+      }
+
+      @media (max-width: 720px) {
+        .bar {
+          justify-content: center;
+        }
+
+        .stage {
+          padding: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="bar">
+      <div class="brand">
+        <span class="dot" aria-hidden="true"></span>
+        <strong>Vista móvil</strong>
+        <span class="hint">FinTrack en un marco de teléfono</span>
+      </div>
+
+      <div class="controls">
+        <label>
+          Dispositivo
+          <select id="preset"></select>
+        </label>
+        <label>
+          Ancho
+          <input id="width" type="number" min="280" max="820" step="1" inputmode="numeric" />
+        </label>
+        <label>
+          Alto
+          <input id="height" type="number" min="480" max="1200" step="1" inputmode="numeric" />
+        </label>
+        <label>
+          <input id="fit" type="checkbox" />
+          Ajustar
+        </label>
+        <button id="reload" type="button">Recargar</button>
+        <a class="action" href="/app" target="_blank" rel="noreferrer">Abrir /app</a>
+      </div>
+    </header>
+
+    <main class="stage" id="stage">
+      <div class="device" id="device">
+        <iframe id="frame" src="/app" title="FinTrack en vista móvil"></iframe>
+      </div>
+    </main>
+
+    <footer class="meta">
+      <span id="size">390 × 844</span>
+      <span aria-hidden="true">·</span>
+      <span id="viewport">viewport —</span>
+    </footer>
+
+    <script>
+      const PRESETS = [
+        { id: 'iphone-14', label: 'iPhone 14 · 390 × 844', width: 390, height: 844 },
+        { id: 'iphone-se', label: 'iPhone SE · 375 × 667', width: 375, height: 667 },
+        { id: 'pixel-7', label: 'Pixel 7 · 412 × 915', width: 412, height: 915 },
+        { id: 'galaxy-s20', label: 'Galaxy S20 · 360 × 800', width: 360, height: 800 },
+        { id: 'custom', label: 'Personalizado' },
+      ]
+
+      const STORAGE_KEY = 'fintrack:mobile-preview'
+      const MIN_WIDTH = 280
+      const MAX_WIDTH = 820
+      const MIN_HEIGHT = 480
+      const MAX_HEIGHT = 1200
+      const BEZEL = 20
+
+      const stage = document.getElementById('stage')
+      const device = document.getElementById('device')
+      const frame = document.getElementById('frame')
+      const presetSelect = document.getElementById('preset')
+      const widthInput = document.getElementById('width')
+      const heightInput = document.getElementById('height')
+      const fitInput = document.getElementById('fit')
+      const reloadButton = document.getElementById('reload')
+      const sizeLabel = document.getElementById('size')
+      const viewportLabel = document.getElementById('viewport')
+
+      const state = { width: 390, height: 844, fit: true, preset: 'iphone-14' }
+
+      for (const preset of PRESETS) {
+        const option = document.createElement('option')
+        option.value = preset.id
+        option.textContent = preset.label
+        presetSelect.append(option)
+      }
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, Math.round(value)))
+      }
+
+      function save() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+        } catch {
+          /* localStorage may be unavailable */
+        }
+      }
+
+      function load() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')
+          if (!saved) return
+          if (Number.isFinite(saved.width)) state.width = clamp(saved.width, MIN_WIDTH, MAX_WIDTH)
+          if (Number.isFinite(saved.height)) state.height = clamp(saved.height, MIN_HEIGHT, MAX_HEIGHT)
+          if (typeof saved.fit === 'boolean') state.fit = saved.fit
+          if (PRESETS.some((preset) => preset.id === saved.preset)) state.preset = saved.preset
+        } catch {
+          /* ignore corrupted state */
+        }
+      }
+
+      function applyScale() {
+        if (!state.fit) {
+          device.style.setProperty('--scale', '1')
+          return
+        }
+
+        const availableWidth = stage.clientWidth - 56
+        const availableHeight = stage.clientHeight - 56
+        const scale = Math.min(
+          1,
+          availableWidth / (state.width + BEZEL),
+          availableHeight / (state.height + BEZEL),
+        )
+        device.style.setProperty('--scale', String(Math.max(0.2, scale)))
+      }
+
+      function render() {
+        device.style.width = `${state.width + BEZEL}px`
+        device.style.height = `${state.height + BEZEL}px`
+        frame.style.width = `${state.width}px`
+        frame.style.height = `${state.height}px`
+
+        widthInput.value = String(state.width)
+        heightInput.value = String(state.height)
+        presetSelect.value = state.preset
+        fitInput.checked = state.fit
+
+        sizeLabel.textContent = `${state.width} × ${state.height}`
+        applyScale()
+      }
+
+      function setSize(width, height, preset) {
+        state.width = clamp(width, MIN_WIDTH, MAX_WIDTH)
+        state.height = clamp(height, MIN_HEIGHT, MAX_HEIGHT)
+        state.preset = preset
+        render()
+        save()
+      }
+
+      function readViewport() {
+        try {
+          const innerWidth = frame.contentWindow.innerWidth
+          const innerHeight = frame.contentWindow.innerHeight
+          viewportLabel.textContent = `viewport ${innerWidth} × ${innerHeight}`
+        } catch {
+          viewportLabel.textContent = 'viewport —'
+        }
+      }
+
+      presetSelect.addEventListener('change', () => {
+        const preset = PRESETS.find((item) => item.id === presetSelect.value)
+        if (!preset || preset.id === 'custom') {
+          state.preset = 'custom'
+          render()
+          save()
+          return
+        }
+        setSize(preset.width, preset.height, preset.id)
+      })
+
+      widthInput.addEventListener('change', () => {
+        setSize(Number(widthInput.value), state.height, 'custom')
+      })
+
+      heightInput.addEventListener('change', () => {
+        setSize(state.width, Number(heightInput.value), 'custom')
+      })
+
+      fitInput.addEventListener('change', () => {
+        state.fit = fitInput.checked
+        render()
+        save()
+      })
+
+      reloadButton.addEventListener('click', () => {
+        try {
+          frame.contentWindow.location.reload()
+        } catch {
+          frame.src = frame.src
+        }
+      })
+
+      frame.addEventListener('load', readViewport)
+      window.addEventListener('resize', applyScale)
+
+      load()
+      render()
+      readViewport()
+    </script>
+  </body>
+</html>
