@@ -4,6 +4,7 @@ import { Label } from '../atoms/Label'
 import { Select } from '../atoms/Select'
 import { FormAlert } from '../molecules/FormAlert'
 import { FormField } from '../molecules/FormField'
+import { Modal } from '../molecules/Modal'
 import {
   ACCOUNT_TYPES,
   CURRENCIES,
@@ -60,14 +61,10 @@ export function CreateAccountForm({ onCreated, onCancel }: CreateAccountFormProp
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
-    >
+    <Modal open title="Nueva cuenta" size="lg" onClose={onCancel}>
+    <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <div>
-        <h2 className="font-display text-lg font-bold text-slate-900">Nueva cuenta</h2>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="text-xs text-slate-500">
           El saldo inicial queda registrado como un movimiento de apertura.
         </p>
       </div>
@@ -145,5 +142,6 @@ export function CreateAccountForm({ onCreated, onCancel }: CreateAccountFormProp
         </Button>
       </div>
     </form>
+    </Modal>
   )
 }

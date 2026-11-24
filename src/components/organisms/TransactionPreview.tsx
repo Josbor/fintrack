@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Button } from '../atoms/Button'
 import { ReceiptIcon } from '../atoms/Icons'
 import { FormAlert } from '../molecules/FormAlert'
@@ -36,7 +36,7 @@ const amountClasses: Record<TransactionType, string> = {
   opening: 'text-slate-900',
 }
 
-function Detail({ label, value }: { label: string; value: string }) {
+function Detail({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-6 py-3">
       <dt className="shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-400">
@@ -99,7 +99,22 @@ export function TransactionPreview({
           {type === 'transfer' && transferAccountName && (
             <Detail label="Cuenta destino" value={transferAccountName} />
           )}
-          {categoryName && <Detail label="Categoría" value={categoryName} />}
+          {categoryName && (
+            <Detail
+              label="Categoría"
+              value={
+                <span
+                  className={`inline-flex max-w-full items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${
+                    type === 'income'
+                      ? 'bg-brand-50 text-brand-700 ring-brand-200'
+                      : 'bg-rose-50 text-rose-700 ring-rose-200'
+                  }`}
+                >
+                  <span className="truncate">{categoryName}</span>
+                </span>
+              }
+            />
+          )}
           {payee && <Detail label="Comercio" value={payee} />}
           {notes && <Detail label="Notas" value={notes} />}
         </dl>

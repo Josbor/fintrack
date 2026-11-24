@@ -3,6 +3,7 @@ import { Button } from '../atoms/Button'
 import { FormAlert } from '../molecules/FormAlert'
 import { FormField } from '../molecules/FormField'
 import { FormSkeleton } from '../molecules/FormSkeleton'
+import { Modal } from '../molecules/Modal'
 import { CategoryField } from '../molecules/CategoryField'
 import { ReceiptField } from '../molecules/ReceiptField'
 import { formatMoney, accountTypeLabel, type Account } from '../../lib/accounts'
@@ -137,14 +138,10 @@ export function EditTransactionForm({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
-    >
+    <Modal open title="Editar movimiento" size="lg" onClose={handleCancel}>
+    <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <div>
-        <h2 className="font-display text-lg font-bold text-slate-900">Editar movimiento</h2>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="text-xs text-slate-500">
           {TYPE_LABELS[transaction.type]} · {account?.name ?? 'Cuenta'} ·{' '}
           {accountTypeLabel(account?.type ?? 'checking')} ·{' '}
           {formatMoney(transaction.amount, currency)}
@@ -240,5 +237,6 @@ export function EditTransactionForm({
         </Button>
       </div>
     </form>
+    </Modal>
   )
 }
