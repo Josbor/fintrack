@@ -55,12 +55,6 @@
   }
 }
 
-@media (max-height: 850px) {
-  .features {
-    display: none;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .float {
     animation: none;

@@ -1,7 +1,6 @@
-import { ChartPieIcon, ShieldCheckIcon, SparklesIcon, WalletIcon } from '../atoms/Icons'
+import { SparklesIcon } from '../atoms/Icons'
 import { Logo } from '../atoms/Logo'
 import { BalancePreview } from '../molecules/BalancePreview'
-import { FeatureItem } from '../molecules/FeatureItem'
 import styles from './BrandShowcase.module.css'
 
 export function BrandShowcase() {
@@ -35,23 +34,6 @@ export function BrandShowcase() {
         <BalancePreview />
       </div>
 
-      <ul className={`relative z-10 mt-9 space-y-4 ${styles.features}`}>
-        <FeatureItem
-          icon={<WalletIcon className="size-4" />}
-          title="Todas tus cuentas"
-          description="Sincroniza bancos y tarjetas en un solo panel."
-        />
-        <FeatureItem
-          icon={<ChartPieIcon className="size-4" />}
-          title="Presupuestos inteligentes"
-          description="Recibe alertas antes de salirte de tu plan."
-        />
-      </ul>
-
-      <div className="relative z-10 mt-auto flex items-center gap-2 pt-10 text-[11px] font-medium text-brand-100/40">
-        <ShieldCheckIcon className="size-4 text-brand-300/70" />
-        Cifrado AES-256 · Tus datos siempre protegidos
-      </div>
     </div>
   )
 }

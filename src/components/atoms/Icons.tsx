@@ -115,15 +115,6 @@ export function AlertCircleIcon(props: IconProps) {
   )
 }
 
-export function ShieldCheckIcon(props: IconProps) {
-  return (
-    <StrokeIcon {...props}>
-      <path d="M12 3 5 5.8v5.4c0 4.2 2.8 7.6 7 9.8 4.2-2.2 7-5.6 7-9.8V5.8L12 3Z" />
-      <path d="m9 11.8 2.2 2.2L15.4 9.8" />
-    </StrokeIcon>
-  )
-}
-
 export function TrendingUpIcon(props: IconProps) {
   return (
     <StrokeIcon {...props}>
@@ -139,15 +130,6 @@ export function WalletIcon(props: IconProps) {
       <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18a2 2 0 0 1 2 2v1" />
       <rect x="3" y="7.5" width="18" height="12" rx="2.5" />
       <path d="M16 13.5h2.5" />
-    </StrokeIcon>
-  )
-}
-
-export function ChartPieIcon(props: IconProps) {
-  return (
-    <StrokeIcon {...props}>
-      <path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5H12V3.5Z" />
-      <path d="M14.5 2.8A8.5 8.5 0 0 1 21.2 9.5h-6.7V2.8Z" />
     </StrokeIcon>
   )
 }
