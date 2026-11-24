@@ -78,6 +78,35 @@ export function EyeOffIcon(props: IconProps) {
   )
 }
 
+export function PencilIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3Z" />
+      <path d="m13.5 6.5 3 3" />
+    </StrokeIcon>
+  )
+}
+
+export function TrashIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <path d="M4 7h16" />
+      <path d="M9.5 7V5.5A1.5 1.5 0 0 1 11 4h2a1.5 1.5 0 0 1 1.5 1.5V7" />
+      <path d="m6.5 7 .8 12.1A2 2 0 0 0 9.3 21h5.4a2 2 0 0 0 2-1.9L17.5 7" />
+      <path d="M10.5 11v6M13.5 11v6" />
+    </StrokeIcon>
+  )
+}
+
+export function ReceiptIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <path d="M6 3.5h12v17l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4v-17Z" />
+      <path d="M9 8h6M9 12h6M9 16h3" />
+    </StrokeIcon>
+  )
+}
+
 export function ArrowRightIcon(props: IconProps) {
   return (
     <StrokeIcon {...props}>

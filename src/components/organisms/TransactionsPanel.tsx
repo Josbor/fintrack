@@ -8,9 +8,10 @@ import { SectionTourButton } from '../molecules/SectionTourButton'
 import { TransactionRow } from '../molecules/TransactionRow'
 import { CreateTransactionForm } from './CreateTransactionForm'
 import { EditTransactionForm } from './EditTransactionForm'
+import { TransactionPreview } from './TransactionPreview'
 import type { Account } from '../../lib/accounts'
 import type { Category } from '../../lib/categories'
-import { RECEIPT_ACCEPT, getReceiptUrl, validateReceiptFile } from '../../lib/receipts'
+import { RECEIPT_ACCEPT, validateReceiptFile } from '../../lib/receipts'
 import { deleteTransaction, type Transaction } from '../../lib/transactions'
 
 type TransactionsPanelProps = {
@@ -47,6 +48,7 @@ export function TransactionsPanel({
   const [createKey, setCreateKey] = useState(0)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [previewId, setPreviewId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -55,6 +57,7 @@ export function TransactionsPanel({
   const categoriesById = new Map(categories.map((category) => [category.id, category]))
   const hasAccounts = accounts.length > 0
   const editingTransaction = transactions.find((item) => item.id === editingId) ?? null
+  const previewTransaction = transactions.find((item) => item.id === previewId) ?? null
 
   function startCreating(file: File | null = null) {
     setIsMenuOpen(false)
@@ -90,19 +93,6 @@ export function TransactionsPanel({
     onChanged()
   }
 
-  async function handleViewReceipt(transaction: Transaction) {
-    if (!transaction.receiptPath) return
-
-    setActionError(null)
-
-    try {
-      const url = await getReceiptUrl(transaction.receiptPath)
-      window.open(url, '_blank', 'noopener')
-    } catch {
-      setActionError('No pudimos abrir la factura. Inténtalo de nuevo.')
-    }
-  }
-
   async function handleDelete(transaction: Transaction) {
     const confirmed = window.confirm(
       `¿Eliminar "${transaction.description}"? Dejará de contar en el saldo.`,
@@ -115,6 +105,7 @@ export function TransactionsPanel({
     try {
       await deleteTransaction(transaction.id)
       if (editingId === transaction.id) setEditingId(null)
+      if (previewId === transaction.id) setPreviewId(null)
       onChanged()
     } catch {
       setActionError('No pudimos eliminar el movimiento. Inténtalo de nuevo.')
@@ -235,6 +226,25 @@ export function TransactionsPanel({
         />
       )}
 
+      {previewTransaction && (
+        <TransactionPreview
+          transaction={previewTransaction}
+          accountName={accountsById.get(previewTransaction.accountId)?.name ?? 'Cuenta eliminada'}
+          currency={accountsById.get(previewTransaction.accountId)?.currency ?? 'USD'}
+          categoryName={
+            previewTransaction.categoryId
+              ? (categoriesById.get(previewTransaction.categoryId)?.name ?? null)
+              : null
+          }
+          transferAccountName={
+            previewTransaction.transferAccountId
+              ? (accountsById.get(previewTransaction.transferAccountId)?.name ?? null)
+              : null
+          }
+          onClose={() => setPreviewId(null)}
+        />
+      )}
+
       {error && <FormAlert tone="error">{error}</FormAlert>}
       {actionError && <FormAlert tone="error">{actionError}</FormAlert>}
 
@@ -281,8 +291,8 @@ export function TransactionsPanel({
                 transferAccountName={transferAccount?.name ?? null}
                 isEditing={editingId === transaction.id}
                 isDeleting={deletingId === transaction.id}
+                onPreview={() => setPreviewId(transaction.id)}
                 onEdit={() => startEditing(transaction.id)}
-                onViewReceipt={() => handleViewReceipt(transaction)}
                 onDelete={() => handleDelete(transaction)}
               />
             )

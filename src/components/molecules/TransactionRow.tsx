@@ -1,6 +1,8 @@
 import { Button } from '../atoms/Button'
+import { EyeIcon, PencilIcon, TrashIcon } from '../atoms/Icons'
 import { formatMoney } from '../../lib/accounts'
 import type { Transaction } from '../../lib/transactions'
+import { Tooltip } from './Tooltip'
 
 type TransactionRowProps = {
   transaction: Transaction
@@ -8,8 +10,8 @@ type TransactionRowProps = {
   currency: string
   categoryName: string | null
   transferAccountName: string | null
+  onPreview: () => void
   onEdit: () => void
-  onViewReceipt: () => void
   onDelete: () => void
   isDeleting: boolean
   isEditing: boolean
@@ -23,8 +25,8 @@ export function TransactionRow({
   currency,
   categoryName,
   transferAccountName,
+  onPreview,
   onEdit,
-  onViewReceipt,
   onDelete,
   isDeleting,
   isEditing,
@@ -55,54 +57,58 @@ export function TransactionRow({
       }`}
     >
       <div className="flex min-w-0 items-center gap-3 sm:contents">
-      <time
-        dateTime={transaction.occurredAt}
-        className="w-14 shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-400"
-      >
-        {dateFormatter.format(new Date(transaction.occurredAt))}
-      </time>
+        <time
+          dateTime={transaction.occurredAt}
+          className="w-14 shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-400"
+        >
+          {dateFormatter.format(new Date(transaction.occurredAt))}
+        </time>
 
-      <div className="min-w-0 flex-1 basis-40">
-        <p className="text-sm font-semibold text-slate-900 sm:truncate">{description}</p>
-        <p className="text-xs text-slate-500 sm:truncate">{meta}</p>
-        {notes && <p className="text-xs italic text-slate-400 sm:truncate">{notes}</p>}
+        <div className="min-w-0 flex-1 basis-40">
+          <p className="truncate text-sm font-semibold text-slate-900">{description}</p>
+          <p className="truncate text-xs text-slate-500">{meta}</p>
+          {notes && <p className="truncate text-xs italic text-slate-400">{notes}</p>}
+        </div>
+
+        <p className={`shrink-0 text-sm font-bold tabular-nums ${amountClass}`}>
+          {sign}
+          {formatMoney(amount, currency)}
+        </p>
       </div>
 
-      <p className={`shrink-0 text-sm font-bold tabular-nums ${amountClass}`}>
-        {sign}
-        {formatMoney(amount, currency)}
-      </p>
-      </div>
-
-      <div className="flex shrink-0 items-center justify-end">
-        {transaction.receiptPath && (
+      <div className="flex shrink-0 items-center justify-end gap-0.5">
+        <Tooltip label="Vista previa">
           <Button
             variant="ghost"
-            onClick={onViewReceipt}
-            aria-label={`Ver factura de ${description}`}
-            className="px-2.5 py-1.5 text-xs"
+            onClick={onPreview}
+            aria-label={`Vista previa de ${description}`}
+            className="size-9 px-0"
           >
-            Factura
+            <EyeIcon className="size-4.5" />
           </Button>
-        )}
-        <Button
-          variant="ghost"
-          onClick={onEdit}
-          disabled={isEditing}
-          aria-label={`Editar ${description}`}
-          className="px-2.5 py-1.5 text-xs"
-        >
-          Editar
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={onDelete}
-          isLoading={isDeleting}
-          aria-label={`Eliminar ${description}`}
-          className="px-2.5 py-1.5 text-xs"
-        >
-          Eliminar
-        </Button>
+        </Tooltip>
+        <Tooltip label="Editar">
+          <Button
+            variant="ghost"
+            onClick={onEdit}
+            disabled={isEditing}
+            aria-label={`Editar ${description}`}
+            className="size-9 px-0"
+          >
+            <PencilIcon className="size-4.5" />
+          </Button>
+        </Tooltip>
+        <Tooltip label="Eliminar">
+          <Button
+            variant="ghost"
+            onClick={onDelete}
+            isLoading={isDeleting}
+            aria-label={`Eliminar ${description}`}
+            className="size-9 px-0"
+          >
+            <TrashIcon className="size-4.5" />
+          </Button>
+        </Tooltip>
       </div>
     </li>
   )
