@@ -2,6 +2,9 @@ import { useRef, useState, type ChangeEvent } from 'react'
 import { Button } from '../atoms/Button'
 import { Spinner } from '../atoms/Spinner'
 import { FormAlert } from '../molecules/FormAlert'
+import { Modal } from '../molecules/Modal'
+import { Tooltip } from '../molecules/Tooltip'
+import { SectionTourButton } from '../molecules/SectionTourButton'
 import { TransactionRow } from '../molecules/TransactionRow'
 import { CreateTransactionForm } from './CreateTransactionForm'
 import { EditTransactionForm } from './EditTransactionForm'
@@ -19,6 +22,8 @@ type TransactionsPanelProps = {
   selectedAccountId: string | null
   selectedAccountName: string | null
   onClearAccount: () => void
+  onStartTour: () => void
+  onStartFormTour: () => void
   onCategoryCreated: (category: Category) => void
   onChanged: () => void
 }
@@ -32,6 +37,8 @@ export function TransactionsPanel({
   selectedAccountId,
   selectedAccountName,
   onClearAccount,
+  onStartTour,
+  onStartFormTour,
   onCategoryCreated,
   onChanged,
 }: TransactionsPanelProps) {
@@ -117,7 +124,7 @@ export function TransactionsPanel({
   }
 
   return (
-    <section className="space-y-5">
+    <section data-tour="movements" className="space-y-5">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-xl font-bold text-slate-900">Movimientos</h2>
@@ -136,17 +143,21 @@ export function TransactionsPanel({
             <p className="text-xs text-slate-500">Los 50 más recientes de todas tus cuentas</p>
           )}
         </div>
-        {!isCreating && (
-          <div className="relative">
-            <Button
-              onClick={() => setIsMenuOpen((open) => !open)}
-              disabled={!hasAccounts}
-              aria-label="Agregar movimiento"
-              aria-expanded={isMenuOpen}
-              className="size-10 px-0 text-xl"
-            >
-              +
-            </Button>
+        <div className="flex items-center gap-2">
+          <SectionTourButton label="Guía de movimientos" onClick={onStartTour} />
+          {!isCreating && (
+          <div data-tour="movements-add" className="relative">
+            <Tooltip label="Agregar movimiento" disabled={isMenuOpen}>
+              <Button
+                onClick={() => setIsMenuOpen((open) => !open)}
+                disabled={!hasAccounts}
+                aria-label="Agregar movimiento"
+                aria-expanded={isMenuOpen}
+                className="size-10 px-0 text-xl"
+              >
+                +
+              </Button>
+            </Tooltip>
 
             {isMenuOpen && (
               <div className="absolute right-0 z-10 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-card">
@@ -180,14 +191,22 @@ export function TransactionsPanel({
               aria-hidden="true"
             />
           </div>
-        )}
+          )}
+        </div>
       </div>
 
       {!hasAccounts && (
         <FormAlert tone="info">Crea una cuenta antes de registrar movimientos.</FormAlert>
       )}
 
-      {isCreating && hasAccounts && (
+      <Modal
+        open={isCreating && hasAccounts}
+        title="Nuevo movimiento"
+        size="lg"
+        onClose={() => setIsCreating(false)}
+        onGuide={onStartFormTour}
+        guideLabel="Guía de nuevo movimiento"
+      >
         <CreateTransactionForm
           key={`${createKey}-${selectedAccountId ?? 'all'}`}
           accounts={accounts}
@@ -198,7 +217,7 @@ export function TransactionsPanel({
           initialFile={createFile}
           lockedAccountId={selectedAccountId}
         />
-      )}
+      </Modal>
 
       {editingTransaction && (
         <EditTransactionForm
@@ -222,7 +241,10 @@ export function TransactionsPanel({
         </div>
       ) : transactions.length === 0 ? (
         !isCreating && (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center">
+          <div
+            data-tour="movements-list"
+            className="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-12 text-center"
+          >
             <p className="text-sm font-semibold text-slate-900">Sin movimientos todavía</p>
             <p className="mt-1 text-xs text-slate-500">
               {selectedAccountName
@@ -232,7 +254,10 @@ export function TransactionsPanel({
           </div>
         )
       ) : (
-        <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <ul
+          data-tour="movements-list"
+          className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+        >
           {transactions.map((transaction) => {
             const account = accountsById.get(transaction.accountId)
             const transferAccount = transaction.transferAccountId

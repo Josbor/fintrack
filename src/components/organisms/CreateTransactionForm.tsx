@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Button } from '../atoms/Button'
 import { Label } from '../atoms/Label'
 import { Select } from '../atoms/Select'
@@ -44,7 +44,6 @@ export function CreateTransactionForm({
   const [description, setDescription] = useState('')
   const [occurredOn, setOccurredOn] = useState(todayIso)
   const [accountId, setAccountId] = useState(lockedAccountId ?? accounts[0]?.id ?? '')
-  const [transferAccountId, setTransferAccountId] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [payee, setPayee] = useState('')
   const [notes, setNotes] = useState('')
@@ -55,11 +54,23 @@ export function CreateTransactionForm({
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const receiptRef = useRef<string | null>(null)
+  const isSavedRef = useRef(false)
 
-  const isTransfer = type === 'transfer'
+  useEffect(() => {
+    receiptRef.current = receiptPath
+  }, [receiptPath])
+
+  useEffect(() => {
+    return () => {
+      if (receiptRef.current && !isSavedRef.current) {
+        removeReceipt(receiptRef.current).catch(() => undefined)
+      }
+    }
+  }, [])
+
   const categoryKind: CategoryKind = type === 'income' ? 'income' : 'expense'
   const currency = accounts.find((item) => item.id === accountId)?.currency ?? 'USD'
-  const destinationAccounts = accounts.filter((item) => item.id !== accountId)
 
   function clearError(key: string) {
     setErrors((current) => {
@@ -113,9 +124,6 @@ export function CreateTransactionForm({
     if (!occurredOn) {
       nextErrors.occurredOn = 'Selecciona una fecha.'
     }
-    if (isTransfer && (!transferAccountId || transferAccountId === accountId)) {
-      nextErrors.transferAccount = 'Elige una cuenta destino distinta a la de origen.'
-    }
 
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
@@ -132,10 +140,11 @@ export function CreateTransactionForm({
         notes,
         occurredOn,
         accountId,
-        transferAccountId: isTransfer ? transferAccountId : null,
+        transferAccountId: null,
         categoryId: categories.some((item) => item.id === categoryId) ? categoryId : null,
         receiptPath,
       })
+      isSavedRef.current = true
       onCreated()
     } catch {
       setFormError('No pudimos guardar el movimiento. Revisa los datos e inténtalo de nuevo.')
@@ -145,17 +154,10 @@ export function CreateTransactionForm({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
-    >
+    <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="font-display text-lg font-bold text-slate-900">Nuevo movimiento</h2>
-          <p className="mt-1 text-xs text-slate-500">Moneda de la cuenta: {currency}</p>
-        </div>
-        <div className="sm:w-80">
+        <p className="text-xs text-slate-500">Moneda de la cuenta: {currency}</p>
+        <div data-tour="movement-type" className="sm:w-80">
           <TransactionTypeToggle
             value={type}
             onChange={(next) => {
@@ -166,6 +168,7 @@ export function CreateTransactionForm({
         </div>
       </div>
 
+      <div data-tour="movement-receipt">
       <ReceiptField
         receiptPath={receiptPath}
         receiptName={receiptName}
@@ -177,11 +180,12 @@ export function CreateTransactionForm({
         initialFile={initialFile}
         onProcessingChange={setIsReadingReceipt}
       />
+      </div>
 
       {isReadingReceipt ? (
         <FormSkeleton label="Leyendo la factura… los campos se habilitarán al terminar." />
       ) : (
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div data-tour="movement-fields" className="grid gap-4 sm:grid-cols-2">
         <FormField
           label="Monto"
           required
@@ -219,7 +223,7 @@ export function CreateTransactionForm({
           inputProps={{
             value: description,
             maxLength: 120,
-            placeholder: isTransfer ? 'Ej. Traspaso a ahorro' : 'Ej. Supermercado',
+            placeholder: 'Ej. Supermercado',
             onChange: (event) => {
               setDescription(event.target.value)
               clearError('description')
@@ -229,16 +233,16 @@ export function CreateTransactionForm({
 
         <div className="space-y-2">
           <Label htmlFor="transaction-account" required>
-            {isTransfer ? 'Cuenta origen' : 'Cuenta'}
+            Cuenta
           </Label>
           <Select
             id="transaction-account"
+            data-tour="movement-account"
             value={accountId}
             disabled={Boolean(lockedAccountId)}
             hasError={Boolean(errors.account)}
             onChange={(event) => {
               setAccountId(event.target.value)
-              if (transferAccountId === event.target.value) setTransferAccountId('')
               clearError('account')
             }}
           >
@@ -251,40 +255,13 @@ export function CreateTransactionForm({
           {errors.account && <p className="text-xs font-medium text-rose-600">{errors.account}</p>}
         </div>
 
-        {isTransfer ? (
-          <div className="space-y-2">
-            <Label htmlFor="transaction-transfer-account" required>
-              Cuenta destino
-            </Label>
-            <Select
-              id="transaction-transfer-account"
-              value={transferAccountId}
-              hasError={Boolean(errors.transferAccount)}
-              onChange={(event) => {
-                setTransferAccountId(event.target.value)
-                clearError('transferAccount')
-              }}
-            >
-              <option value="">Selecciona una cuenta</option>
-              {destinationAccounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.name}
-                </option>
-              ))}
-            </Select>
-            {errors.transferAccount && (
-              <p className="text-xs font-medium text-rose-600">{errors.transferAccount}</p>
-            )}
-          </div>
-        ) : (
-          <CategoryField
-            kind={categoryKind}
-            categories={categories}
-            value={categoryId}
-            onChange={setCategoryId}
-            onCategoryCreated={onCategoryCreated}
-          />
-        )}
+        <CategoryField
+          kind={categoryKind}
+          categories={categories}
+          value={categoryId}
+          onChange={setCategoryId}
+          onCategoryCreated={onCategoryCreated}
+        />
 
         <FormField
           label="Comercio o persona"
@@ -313,15 +290,17 @@ export function CreateTransactionForm({
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Button
           variant="ghost"
-          onClick={async () => {
-            if (receiptPath) await removeReceipt(receiptPath).catch(() => undefined)
-            onCancel()
-          }}
+          onClick={onCancel}
           disabled={isSubmitting || isReadingReceipt}
         >
           Cancelar
         </Button>
-        <Button type="submit" isLoading={isSubmitting} disabled={isReadingReceipt}>
+        <Button
+          type="submit"
+          isLoading={isSubmitting}
+          disabled={isReadingReceipt}
+          data-tour="movement-submit"
+        >
           Guardar movimiento
         </Button>
       </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { EyeIcon, EyeOffIcon, LockIcon } from '../atoms/Icons'
 import { FormField } from './FormField'
+import { Tooltip } from './Tooltip'
 
 type PasswordFieldProps = {
   value: string
@@ -33,16 +34,18 @@ export function PasswordField({
       required
       leadingIcon={<LockIcon className="size-4" />}
       trailing={
-        <button
-          type="button"
-          onClick={() => setIsVisible((visible) => !visible)}
-          aria-label={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-          aria-pressed={isVisible}
-          disabled={disabled}
-          className="-mr-1 grid size-8 shrink-0 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:cursor-not-allowed"
-        >
-          {isVisible ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
-        </button>
+        <Tooltip label={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
+          <button
+            type="button"
+            onClick={() => setIsVisible((visible) => !visible)}
+            aria-label={isVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            aria-pressed={isVisible}
+            disabled={disabled}
+            className="-mr-1 grid size-8 shrink-0 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:cursor-not-allowed"
+          >
+            {isVisible ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
+          </button>
+        </Tooltip>
       }
       inputProps={{
         type: isVisible ? 'text' : 'password',

@@ -5,7 +5,6 @@ export type TransactionType = 'income' | 'expense' | 'transfer' | 'opening'
 export const CREATABLE_TRANSACTION_TYPES = [
   { value: 'expense', label: 'Gasto' },
   { value: 'income', label: 'Ingreso' },
-  { value: 'transfer', label: 'Transferencia' },
 ] as const
 
 export type CreatableTransactionType = (typeof CREATABLE_TRANSACTION_TYPES)[number]['value']
@@ -34,7 +33,7 @@ export type UpdateTransactionInput = {
 }
 
 export type CreateTransactionInput = {
-  type: CreatableTransactionType
+  type: CreatableTransactionType | 'transfer'
   amount: number
   description: string
   payee: string

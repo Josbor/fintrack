@@ -4,6 +4,8 @@ import { Spinner } from '../atoms/Spinner'
 import { TransferIcon, WalletIcon } from '../atoms/Icons'
 import { AccountCard } from '../molecules/AccountCard'
 import { FormAlert } from '../molecules/FormAlert'
+import { SectionTourButton } from '../molecules/SectionTourButton'
+import { Tooltip } from '../molecules/Tooltip'
 import { CreateAccountForm } from './CreateAccountForm'
 import type { Account } from '../../lib/accounts'
 
@@ -14,6 +16,7 @@ type AccountsPanelProps = {
   selectedAccountId: string | null
   onSelectAccount: (accountId: string | null) => void
   onTransfer: () => void
+  onStartTour: () => void
   onChanged: () => void
 }
 
@@ -24,6 +27,7 @@ export function AccountsPanel({
   selectedAccountId,
   onSelectAccount,
   onTransfer,
+  onStartTour,
   onChanged,
 }: AccountsPanelProps) {
   const [isCreating, setIsCreating] = useState(false)
@@ -38,33 +42,41 @@ export function AccountsPanel({
   }
 
   return (
-    <section className="space-y-5">
+    <section data-tour="accounts" className="space-y-5">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h2 className="font-display text-xl font-bold text-slate-900">Cuentas</h2>
           <p className="text-xs text-slate-500">Selecciona una cuenta para ver sus movimientos</p>
         </div>
-        {!isCreating && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="social"
-              onClick={onTransfer}
-              disabled={accounts.length < 2}
-              aria-label="Transferir entre cuentas"
-              title="Transferir entre cuentas"
-              className="size-10 px-0"
-            >
-              <TransferIcon className="size-5" />
-            </Button>
-            <Button
-              onClick={() => setIsCreating(true)}
-              aria-label="Nueva cuenta"
-              className="size-10 px-0 text-xl"
-            >
-              +
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <SectionTourButton label="Guía de cuentas" onClick={onStartTour} />
+          {!isCreating && (
+            <div data-tour="accounts-actions" className="flex items-center gap-2">
+              <Tooltip label="Transferir entre cuentas">
+                <Button
+                  variant="social"
+                  onClick={onTransfer}
+                  disabled={accounts.length < 2}
+                  aria-label="Transferir entre cuentas"
+                  data-tour="transfer"
+                  className="size-10 px-0"
+                >
+                  <TransferIcon className="size-5" />
+                </Button>
+              </Tooltip>
+              <Tooltip label="Nueva cuenta">
+                <Button
+                  onClick={() => setIsCreating(true)}
+                  aria-label="Nueva cuenta"
+                  data-tour="new-account"
+                  className="size-10 px-0 text-xl"
+                >
+                  +
+                </Button>
+              </Tooltip>
+            </div>
+          )}
+        </div>
       </div>
 
       {isCreating && (

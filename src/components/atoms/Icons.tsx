@@ -87,6 +87,16 @@ export function ArrowRightIcon(props: IconProps) {
   )
 }
 
+export function HelpIcon(props: IconProps) {
+  return (
+    <StrokeIcon {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.6 9.2a2.5 2.5 0 0 1 4.9.6c0 1.7-2.5 2-2.5 3.7" />
+      <path d="M12 17.2h.01" />
+    </StrokeIcon>
+  )
+}
+
 export function CheckIcon(props: IconProps) {
   return (
     <StrokeIcon {...props}>

@@ -13,7 +13,7 @@ export function TotalBalanceCard({ accounts }: TotalBalanceCardProps) {
   const entries = Object.entries(totals)
 
   return (
-    <section className="rounded-2xl bg-brand-950 p-6 text-white shadow-glow sm:p-7">
+    <section data-tour="total-balance" className="rounded-2xl bg-brand-950 p-6 text-white shadow-glow sm:p-7">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-300">
         Saldo total
       </p>

@@ -96,13 +96,14 @@ export function TransferForm({ accounts, onCreated, onCancel }: TransferFormProp
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div data-tour="transfer-fields" className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="transfer-from" required>
             Desde
           </Label>
           <Select
             id="transfer-from"
+            data-tour="transfer-from"
             value={fromId}
             onChange={(event) => {
               const nextFrom = event.target.value
@@ -132,6 +133,7 @@ export function TransferForm({ accounts, onCreated, onCancel }: TransferFormProp
           </Label>
           <Select
             id="transfer-to"
+            data-tour="transfer-to"
             value={toId}
             hasError={Boolean(errors.toAccount)}
             onChange={(event) => {
@@ -201,7 +203,7 @@ export function TransferForm({ accounts, onCreated, onCancel }: TransferFormProp
         <Button variant="ghost" onClick={onCancel} disabled={isSubmitting}>
           Cancelar
         </Button>
-        <Button type="submit" isLoading={isSubmitting}>
+        <Button type="submit" isLoading={isSubmitting} data-tour="transfer-submit">
           Transferir
         </Button>
       </div>

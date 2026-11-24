@@ -6,6 +6,7 @@ import { Modal } from '../components/molecules/Modal'
 import { TotalBalanceCard } from '../components/molecules/TotalBalanceCard'
 import { AccountsPanel } from '../components/organisms/AccountsPanel'
 import { PreferencesPanel } from '../components/organisms/PreferencesPanel'
+import { TourOverlay } from '../components/organisms/TourOverlay'
 import { TransactionsPanel } from '../components/organisms/TransactionsPanel'
 import { TransferForm } from '../components/organisms/TransferForm'
 import { DashboardLayout } from '../components/templates/DashboardLayout'
@@ -13,6 +14,14 @@ import { useAccounts } from '../hooks/useAccounts'
 import { useCategories } from '../hooks/useCategories'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useTransactions } from '../hooks/useTransactions'
+import {
+  ACCOUNTS_TOUR,
+  MOVEMENT_FORM_TOUR,
+  MOVEMENTS_TOUR,
+  SETTINGS_TOUR,
+  TRANSFER_TOUR,
+} from '../tour/tours'
+import type { TourDefinition } from '../tour/types'
 
 export function DashboardPage() {
   usePageTitle('FinTrack · Tu panel')
@@ -26,6 +35,7 @@ export function DashboardPage() {
   const [isSigningOut, setIsSigningOut] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isTransferOpen, setIsTransferOpen] = useState(false)
+  const [activeTour, setActiveTour] = useState<TourDefinition | null>(null)
 
   const selectedAccount =
     accountsData.accounts.find((account) => account.id === selectedAccountId) ?? null
@@ -49,7 +59,7 @@ export function DashboardPage() {
       onSignOut={handleSignOut}
       isSigningOut={isSigningOut}
       headerActions={
-        <Button variant="ghost" onClick={() => setIsSettingsOpen(true)}>
+        <Button variant="ghost" onClick={() => setIsSettingsOpen(true)} data-tour="settings">
           Configuración
         </Button>
       }
@@ -72,6 +82,7 @@ export function DashboardPage() {
         selectedAccountId={selectedAccountId}
         onSelectAccount={setSelectedAccountId}
         onTransfer={() => setIsTransferOpen(true)}
+        onStartTour={() => setActiveTour(ACCOUNTS_TOUR)}
         onChanged={refreshData}
       />
 
@@ -84,6 +95,8 @@ export function DashboardPage() {
         selectedAccountId={selectedAccountId}
         selectedAccountName={selectedAccount?.name ?? null}
         onClearAccount={() => setSelectedAccountId(null)}
+        onStartTour={() => setActiveTour(MOVEMENTS_TOUR)}
+        onStartFormTour={() => setActiveTour(MOVEMENT_FORM_TOUR)}
         onCategoryCreated={(category) =>
           setCategories((current) =>
             [...current, category].sort((a, b) => a.name.localeCompare(b.name)),
@@ -92,7 +105,13 @@ export function DashboardPage() {
         onChanged={refreshData}
       />
 
-      <Modal open={isSettingsOpen} title="Configuración" onClose={() => setIsSettingsOpen(false)}>
+      <Modal
+        open={isSettingsOpen}
+        title="Configuración"
+        onClose={() => setIsSettingsOpen(false)}
+        onGuide={() => setActiveTour(SETTINGS_TOUR)}
+        guideLabel="Guía de configuración"
+      >
         <PreferencesPanel />
       </Modal>
 
@@ -100,6 +119,8 @@ export function DashboardPage() {
         open={isTransferOpen}
         title="Transferir entre cuentas"
         onClose={() => setIsTransferOpen(false)}
+        onGuide={() => setActiveTour(TRANSFER_TOUR)}
+        guideLabel="Guía de transferencias"
       >
         <TransferForm
           accounts={accountsData.accounts}
@@ -110,6 +131,8 @@ export function DashboardPage() {
           onCancel={() => setIsTransferOpen(false)}
         />
       </Modal>
+
+      <TourOverlay tour={activeTour} onClose={() => setActiveTour(null)} />
     </DashboardLayout>
   )
 }

@@ -13,7 +13,7 @@ export function TransactionTypeToggle({ value, onChange }: TransactionTypeToggle
     <div
       role="radiogroup"
       aria-label="Tipo de movimiento"
-      className="grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1"
+      className="grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1"
     >
       {CREATABLE_TRANSACTION_TYPES.map((item) => {
         const isActive = item.value === value

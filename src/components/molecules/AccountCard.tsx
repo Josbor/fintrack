@@ -15,6 +15,7 @@ export function AccountCard({ account, isSelected, onSelect }: AccountCardProps)
       type="button"
       onClick={onSelect}
       aria-pressed={isSelected}
+      data-tour="account-card"
       className={`flex flex-col gap-4 rounded-2xl border bg-white p-5 text-left shadow-sm transition hover:shadow-md focus-visible:ring-4 focus-visible:ring-brand-500/20 outline-none ${
         isSelected
           ? 'border-brand-500 ring-4 ring-brand-500/10'
