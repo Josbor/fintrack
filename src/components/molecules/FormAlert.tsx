@@ -4,6 +4,7 @@ import { AlertCircleIcon, CheckIcon } from '../atoms/Icons'
 type FormAlertProps = {
   tone: 'success' | 'error' | 'info'
   children: ReactNode
+  action?: ReactNode
 }
 
 const tones = {
@@ -21,16 +22,20 @@ const tones = {
   },
 }
 
-export function FormAlert({ tone, children }: FormAlertProps) {
+export function FormAlert({ tone, children, action }: FormAlertProps) {
   const styles = tones[tone]
 
   return (
     <div
       role={tone === 'error' ? 'alert' : 'status'}
-      className={`flex items-start gap-3 rounded-xl border px-3.5 py-3 text-xs font-medium leading-relaxed ${styles.wrapper}`}
+      className={`flex gap-3 rounded-xl border px-3.5 py-3 text-xs font-medium leading-relaxed ${
+        action ? 'items-center' : 'items-start'
+      } ${styles.wrapper}`}
     >
       <span
-        className={`mt-px grid size-5 shrink-0 place-items-center rounded-full ${styles.icon}`}
+        className={`grid size-5 shrink-0 place-items-center rounded-full ${
+          action ? '' : 'mt-px'
+        } ${styles.icon}`}
         aria-hidden="true"
       >
         {tone === 'success' ? (
@@ -39,7 +44,14 @@ export function FormAlert({ tone, children }: FormAlertProps) {
           <AlertCircleIcon className="size-3.5" />
         )}
       </span>
-      <span>{children}</span>
+      {action ? (
+        <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <span>{children}</span>
+          <div className="shrink-0">{action}</div>
+        </div>
+      ) : (
+        <span>{children}</span>
+      )}
     </div>
   )
 }

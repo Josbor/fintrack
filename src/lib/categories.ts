@@ -35,3 +35,9 @@ export async function createCategory(name: string, kind: CategoryKind): Promise<
 
   return data as Category
 }
+
+export async function deleteCategory(id: string): Promise<void> {
+  const { error } = await supabase.from('categories').delete().eq('id', id)
+
+  if (error) throw new Error(error.message)
+}

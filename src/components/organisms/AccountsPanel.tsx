@@ -51,6 +51,7 @@ export function AccountsPanel({
         <div className="flex items-center gap-2">
           <SectionTourButton
             label="Guía de cuentas"
+            variant="ghost"
             onClick={onStartTour}
             className="max-sm:hidden"
           />

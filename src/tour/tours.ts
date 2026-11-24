@@ -52,7 +52,7 @@ export const MOVEMENTS_TOUR: TourDefinition = {
       target: 'movements-add',
       title: 'Agregar movimiento',
       description:
-        'El menú ofrece dos caminos: alta manual, o «Desde una factura» para leerla desde una imagen o PDF.',
+        'El menú ofrece dos caminos: alta manual, o «Desde una factura» para leerla desde una imagen o PDF. Necesitas al menos una categoría, que se crea en Configuración.',
       placement: 'left',
     },
     {
@@ -88,7 +88,7 @@ export const MOVEMENT_FORM_TOUR: TourDefinition = {
       target: 'movement-fields',
       title: 'Monto, fecha y descripción',
       description:
-        'El monto debe ser mayor a 0. La categoría ayuda a ver tus gastos; si no existe, puedes crearla aquí mismo.',
+        'El monto debe ser mayor a 0. La categoría clasifica el movimiento; puedes administrarlas en Configuración.',
       placement: 'bottom',
     },
     {
@@ -143,16 +143,16 @@ export const TRANSFER_TOUR: TourDefinition = {
   ],
 }
 
-export const SETTINGS_TOUR: TourDefinition = {
-  id: 'configuracion',
-  title: 'Configuración',
+export const SCANNER_TOUR: TourDefinition = {
+  id: 'lector-facturas',
+  title: 'Lector de facturas',
   description: 'Cómo se leen tus facturas.',
   steps: [
     {
       target: 'scanner-select',
-      title: 'Lector de facturas',
+      title: 'Elige el lector',
       description:
-        'Elige cómo se leen tus facturas: OCR en tu navegador, o inteligencia artificial de Gemini, que es más rápida.',
+        'OCR lee la factura en tu navegador. Inteligencia artificial (Gemini) es más rápida.',
       placement: 'bottom',
     },
     {
@@ -160,6 +160,35 @@ export const SETTINGS_TOUR: TourDefinition = {
       title: 'Privacidad',
       description:
         'Con OCR la imagen nunca sale de tu equipo. Con IA, la factura se envía a Google para leerla.',
+      placement: 'top',
+    },
+  ],
+}
+
+export const CATEGORIES_TOUR: TourDefinition = {
+  id: 'categorias',
+  title: 'Categorías',
+  description: 'Clasifica tus ingresos y gastos.',
+  steps: [
+    {
+      target: 'categories',
+      title: 'Tus categorías',
+      description:
+        'Clasifican tus ingresos y gastos. Necesitas al menos una para registrar movimientos.',
+      placement: 'bottom',
+    },
+    {
+      target: 'category-form',
+      title: 'Crear una categoría',
+      description:
+        'Escribe el nombre, elige si es de gasto o de ingreso y pulsa Agregar.',
+      placement: 'bottom',
+    },
+    {
+      target: 'category-list',
+      title: 'Gastos en rojo, ingresos en verde',
+      description:
+        'Cada chip es una categoría. Con la × la eliminas; los movimientos que la usen quedan sin categoría.',
       placement: 'top',
     },
   ],

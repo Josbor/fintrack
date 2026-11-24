@@ -19,12 +19,14 @@ type TransactionsPanelProps = {
   accounts: Account[]
   categories: Category[]
   isLoading: boolean
+  isLoadingCategories: boolean
   error: string | null
   selectedAccountId: string | null
   selectedAccountName: string | null
   onClearAccount: () => void
   onStartTour: () => void
   onStartFormTour: () => void
+  onOpenSettings: () => void
   onCategoryCreated: (category: Category) => void
   onChanged: () => void
 }
@@ -34,12 +36,14 @@ export function TransactionsPanel({
   accounts,
   categories,
   isLoading,
+  isLoadingCategories,
   error,
   selectedAccountId,
   selectedAccountName,
   onClearAccount,
   onStartTour,
   onStartFormTour,
+  onOpenSettings,
   onCategoryCreated,
   onChanged,
 }: TransactionsPanelProps) {
@@ -56,10 +60,14 @@ export function TransactionsPanel({
   const accountsById = new Map(accounts.map((account) => [account.id, account]))
   const categoriesById = new Map(categories.map((category) => [category.id, category]))
   const hasAccounts = accounts.length > 0
+  const isMissingCategories = !isLoadingCategories && categories.length === 0
+  const canAddMovement = hasAccounts && !isMissingCategories
   const editingTransaction = transactions.find((item) => item.id === editingId) ?? null
   const previewTransaction = transactions.find((item) => item.id === previewId) ?? null
 
   function startCreating(file: File | null = null) {
+    if (!canAddMovement) return
+
     setIsMenuOpen(false)
     setEditingId(null)
     setCreateFile(file)
@@ -137,24 +145,28 @@ export function TransactionsPanel({
         <div className="flex items-center gap-2">
           <SectionTourButton
             label="Guía de movimientos"
+            variant="ghost"
             onClick={onStartTour}
             className="max-sm:hidden"
           />
           {!isCreating && (
           <div data-tour="movements-add" className="relative">
-            <Tooltip label="Agregar movimiento" disabled={isMenuOpen}>
+            <Tooltip
+              label={isMissingCategories ? 'Configura tus categorías primero' : 'Agregar movimiento'}
+              disabled={isMenuOpen}
+            >
               <Button
                 onClick={() => setIsMenuOpen((open) => !open)}
-                disabled={!hasAccounts}
+                disabled={!canAddMovement}
                 aria-label="Agregar movimiento"
-                aria-expanded={isMenuOpen}
+                aria-expanded={isMenuOpen && canAddMovement}
                 className="size-10 px-0 text-xl"
               >
                 +
               </Button>
             </Tooltip>
 
-            {isMenuOpen && (
+            {isMenuOpen && canAddMovement && (
               <div className="absolute right-0 z-10 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-card">
                 <button
                   type="button"
@@ -194,8 +206,22 @@ export function TransactionsPanel({
         <FormAlert tone="info">Crea una cuenta antes de registrar movimientos.</FormAlert>
       )}
 
+      {hasAccounts && isMissingCategories && (
+        <FormAlert
+          tone="info"
+          action={
+            <Button variant="social" onClick={onOpenSettings} className="px-3 py-2 text-xs">
+              Configurar categorías
+            </Button>
+          }
+        >
+          Necesitas al menos una categoría para registrar movimientos. Configúrala en
+          Configuración.
+        </FormAlert>
+      )}
+
       <Modal
-        open={isCreating && hasAccounts}
+        open={isCreating && hasAccounts && !isMissingCategories}
         title="Nuevo movimiento"
         size="lg"
         onClose={() => setIsCreating(false)}
@@ -261,9 +287,11 @@ export function TransactionsPanel({
           >
             <p className="text-sm font-semibold text-slate-900">Sin movimientos todavía</p>
             <p className="mt-1 text-xs text-slate-500">
-              {selectedAccountName
-                ? `${selectedAccountName} aún no tiene movimientos.`
-                : 'Registra tu primer ingreso, gasto o transferencia.'}
+              {isMissingCategories
+                ? 'Configura tus categorías para registrar tu primer movimiento.'
+                : selectedAccountName
+                  ? `${selectedAccountName} aún no tiene movimientos.`
+                  : 'Registra tu primer ingreso, gasto o transferencia.'}
             </p>
           </div>
         )
