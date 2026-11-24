@@ -49,7 +49,11 @@ export function AccountsPanel({
           <p className="text-xs text-slate-500">Selecciona una cuenta para ver sus movimientos</p>
         </div>
         <div className="flex items-center gap-2">
-          <SectionTourButton label="Guía de cuentas" onClick={onStartTour} />
+          <SectionTourButton
+            label="Guía de cuentas"
+            onClick={onStartTour}
+            className="max-sm:hidden"
+          />
           {!isCreating && (
             <div data-tour="accounts-actions" className="flex items-center gap-2">
               <Tooltip label="Transferir entre cuentas">

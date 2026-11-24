@@ -4,11 +4,12 @@ type TooltipProps = {
   label: string
   children: ReactNode
   disabled?: boolean
+  className?: string
 }
 
-export function Tooltip({ label, children, disabled = false }: TooltipProps) {
+export function Tooltip({ label, children, disabled = false, className = '' }: TooltipProps) {
   return (
-    <span className="group relative inline-flex">
+    <span className={`group relative inline-flex ${className}`}>
       {children}
       {!disabled && (
         <span

@@ -144,7 +144,11 @@ export function TransactionsPanel({
           )}
         </div>
         <div className="flex items-center gap-2">
-          <SectionTourButton label="Guía de movimientos" onClick={onStartTour} />
+          <SectionTourButton
+            label="Guía de movimientos"
+            onClick={onStartTour}
+            className="max-sm:hidden"
+          />
           {!isCreating && (
           <div data-tour="movements-add" className="relative">
             <Tooltip label="Agregar movimiento" disabled={isMenuOpen}>

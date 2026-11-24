@@ -5,6 +5,7 @@ type SectionTourButtonProps = {
   label: string
   onClick: () => void
   variant?: 'outlined' | 'ghost'
+  className?: string
 }
 
 const variants = {
@@ -14,9 +15,14 @@ const variants = {
     'text-slate-400 hover:bg-slate-100 hover:text-brand-700 focus-visible:ring-slate-300/40',
 }
 
-export function SectionTourButton({ label, onClick, variant = 'outlined' }: SectionTourButtonProps) {
+export function SectionTourButton({
+  label,
+  onClick,
+  variant = 'outlined',
+  className,
+}: SectionTourButtonProps) {
   return (
-    <Tooltip label={label}>
+    <Tooltip label={label} className={className}>
       <button
         type="button"
         onClick={onClick}
